@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Converter Mini Unicode</title>
+  <title>Tyni Unicode Converter</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -60,7 +60,7 @@
 </head>
 <body>
   <h1>Mini Unicode Converter</h1>
-  <input type="text" id="inputText" placeholder="Enter text here">
+  <input type="text" id="inputText" placeholder="Enter your text here">
   <button onclick="convert()">Convertir</button>
   <textarea id="outputText" readonly placeholder="Result..."></textarea>
 
@@ -78,13 +78,29 @@
       V: 'ᴠ', W: 'ᴡ', X: 'x', Y: 'ʏ', Z: 'ᴢ'
     };
 
-    function convert() {
-      const text = document.getElementById('inputText').value;
+    function convertText(text) {
       let result = '';
       for (let char of text) {
         result += smallCapsMap[char] || char;
       }
-      document.getElementById('outputText').value = result;
+      return result;
+    }
+
+    function convert() {
+      const text = document.getElementById('inputText').value;
+      document.getElementById('outputText').value = convertText(text);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const apiText = params.get("text");
+
+    if (apiText) {
+      const converted = convertText(apiText);
+      document.getElementById('inputText').value = apiText;
+      document.getElementById('outputText').value = converted;
+
+
+      document.body.innerHTML = `<pre style="color:white;font-size:1.5rem">${converted}</pre>`;
     }
   </script>
 </body>
