@@ -2,8 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tyni Unicode Converter</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #121212;
@@ -12,23 +15,26 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      min-height: 100dvh;
       margin: 0;
+      padding: 24px 16px;
     }
 
     h1 {
       color: #ff8c00;
-      margin-bottom: 1rem;
+      margin: 0 0 1rem 0;
+      text-align: center;
+      font-size: clamp(1.4rem, 4vw, 2rem);
     }
 
     input, textarea, button {
-      width: 90%;
-      max-width: 500px;
-      padding: 0.5rem 1rem;
+      width: min(500px, 100%);
+      padding: 0.75rem 1rem;
       margin: 0.5rem 0;
       border-radius: 8px;
       border: none;
-      font-size: 1rem;
+      font-size: clamp(0.95rem, 3.5vw, 1rem);
       outline: none;
     }
 
@@ -38,12 +44,17 @@
       resize: none;
     }
 
+    textarea {
+      min-height: 120px;
+    }
+
     button {
       background: #ff8c00;
       color: #121212;
       cursor: pointer;
       font-weight: bold;
       transition: background 0.3s;
+      touch-action: manipulation;
     }
 
     button:hover {
@@ -51,10 +62,21 @@
     }
 
     footer {
-      position: absolute;
+      position: fixed;
+      left: 0;
+      right: 0;
       bottom: 10px;
+      text-align: center;
+      padding: 0 12px;
       font-size: 0.8rem;
       color: #888;
+    }
+
+    @media (max-height: 520px) {
+      footer {
+        position: static;
+        margin-top: 12px;
+      }
     }
   </style>
 </head>
@@ -98,8 +120,6 @@
       const converted = convertText(apiText);
       document.getElementById('inputText').value = apiText;
       document.getElementById('outputText').value = converted;
-
-
       document.body.innerHTML = `<pre style="color:white;font-size:1.5rem">${converted}</pre>`;
     }
   </script>
