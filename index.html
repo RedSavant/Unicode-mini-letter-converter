@@ -61,6 +61,74 @@
       background: #ffa733;
     }
 
+    
+    .toggle-row {
+      width: min(500px, 100%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0.25rem 0 0.25rem 0;
+    }
+
+    .toggle-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e1e1e;
+      border: 1.5px solid #2e2e2e;
+      border-radius: 999px;
+      padding: 6px 14px 6px 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s, background 0.2s;
+      touch-action: manipulation;
+      font-size: clamp(0.8rem, 3vw, 0.88rem);
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    .toggle-bubble:hover {
+      border-color: #ff8c00;
+      background: #242424;
+    }
+
+    .toggle-bubble.active {
+      border-color: #ff8c00;
+      color: #ff8c00;
+      background: #1e1e1e;
+    }
+
+    
+    .pill {
+      width: 32px;
+      height: 18px;
+      border-radius: 999px;
+      background: #3a3a3a;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .toggle-bubble.active .pill {
+      background: #ff8c00;
+    }
+
+    .pill::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+
+    .toggle-bubble.active .pill::after {
+      transform: translateX(14px);
+    }
+
     footer {
       position: fixed;
       left: 0;
@@ -83,12 +151,28 @@
 <body>
   <h1>Mini Unicode Converter</h1>
   <input type="text" id="inputText" placeholder="Enter your text here">
+
+  
+  <div class="toggle-row">
+    <div class="toggle-bubble" id="legacyToggle" onclick="toggleLegacy()">
+      <span class="pill"></span>
+      legacy color code
+    </div>
+  </div>
+
   <button onclick="convert()">Convertir</button>
   <textarea id="outputText" readonly placeholder="Result..."></textarea>
 
   <footer>Made by RedSavant</footer>
 
   <script>
+    let legacyMode = false;
+
+    function toggleLegacy() {
+      legacyMode = !legacyMode;
+      document.getElementById('legacyToggle').classList.toggle('active', legacyMode);
+    }
+
     const smallCapsMap = {
       a: 'ᴀ', b: 'ʙ', c: 'ᴄ', d: 'ᴅ', e: 'ᴇ', f: 'ꜰ', g: 'ɢ',
       h: 'ʜ', i: 'ɪ', j: 'ᴊ', k: 'ᴋ', l: 'ʟ', m: 'ᴍ', n: 'ɴ',
@@ -100,10 +184,24 @@
       V: 'ᴠ', W: 'ᴡ', X: 'x', Y: 'ʏ', Z: 'ᴢ'
     };
 
+    
+    const MC_CODES = new Set('0123456789abcdefklmnorABCDEFKLMNOR');
+
     function convertText(text) {
       let result = '';
-      for (let char of text) {
+      let i = 0;
+      while (i < text.length) {
+        const char = text[i];
+
+        if (legacyMode && (char === '&' || char === '§') && i + 1 < text.length && MC_CODES.has(text[i + 1])) {
+          // Conserver le préfixe + le code sans conversion
+          result += char + text[i + 1];
+          i += 2;
+          continue;
+        }
+
         result += smallCapsMap[char] || char;
+        i++;
       }
       return result;
     }
