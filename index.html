@@ -61,16 +61,15 @@
       background: #ffa733;
     }
 
-    
-    .toggle-row {
+    .toggles {
       width: min(500px, 100%);
       display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0.25rem 0 0.25rem 0;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0.25rem 0;
     }
 
-    .toggle-bubble {
+    .tog {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -82,23 +81,21 @@
       user-select: none;
       transition: border-color 0.2s, background 0.2s;
       touch-action: manipulation;
-      font-size: clamp(0.8rem, 3vw, 0.88rem);
+      font-size: clamp(0.78rem, 2.8vw, 0.85rem);
       color: #aaa;
       white-space: nowrap;
     }
 
-    .toggle-bubble:hover {
+    .tog:hover {
       border-color: #ff8c00;
       background: #242424;
     }
 
-    .toggle-bubble.active {
+    .tog.active {
       border-color: #ff8c00;
       color: #ff8c00;
-      background: #1e1e1e;
     }
 
-    
     .pill {
       width: 32px;
       height: 18px;
@@ -109,7 +106,7 @@
       transition: background 0.2s;
     }
 
-    .toggle-bubble.active .pill {
+    .tog.active .pill {
       background: #ff8c00;
     }
 
@@ -125,7 +122,7 @@
       transition: transform 0.2s;
     }
 
-    .toggle-bubble.active .pill::after {
+    .tog.active .pill::after {
       transform: translateX(14px);
     }
 
@@ -152,12 +149,15 @@
   <h1>Mini Unicode Converter</h1>
   <input type="text" id="inputText" placeholder="Enter your text here">
 
-  
-  <div class="toggle-row">
-    <div class="toggle-bubble" id="legacyToggle" onclick="toggleLegacy()">
-      <span class="pill"></span>
-      legacy color code
-    </div>
+  <div class="toggles">
+    <div class="tog active" id="tog-legacy"      onclick="toggle('legacy')">     <span class="pill"></span>legacy §x color code</div>
+    <div class="tog"        id="tog-amplegacy"   onclick="toggle('amplegacy')">  <span class="pill"></span>&amp;x color code</div>
+    <div class="tog"        id="tog-hex6"        onclick="toggle('hex6')">       <span class="pill"></span>&amp;#rrggbb</div>
+    <div class="tog"        id="tog-minimsg"     onclick="toggle('minimsg')">    <span class="pill"></span>MiniMessage</div>
+    <div class="tog"        id="tog-json"        onclick="toggle('json')">       <span class="pill"></span>JSON color</div>
+    <div class="tog"        id="tog-hexsect"     onclick="toggle('hexsect')">    <span class="pill"></span>§x§r§r§g§g§b§b</div>
+    <div class="tog"        id="tog-hexamp"      onclick="toggle('hexamp')">     <span class="pill"></span>&amp;x&amp;r&amp;r&amp;g&amp;g&amp;b&amp;b</div>
+    <div class="tog"        id="tog-hexbracket"  onclick="toggle('hexbracket')"> <span class="pill"></span>&lt;#rrggbb&gt;</div>
   </div>
 
   <button onclick="convert()">Convertir</button>
@@ -166,41 +166,99 @@
   <footer>Made by RedSavant</footer>
 
   <script>
-    let legacyMode = false;
+    const modes = {
+      legacy:     true,
+      amplegacy:  false,
+      hex6:       false,
+      minimsg:    false,
+      json:       false,
+      hexsect:    false,
+      hexamp:     false,
+      hexbracket: false
+    };
 
-    function toggleLegacy() {
-      legacyMode = !legacyMode;
-      document.getElementById('legacyToggle').classList.toggle('active', legacyMode);
+    function toggle(key) {
+      modes[key] = !modes[key];
+      document.getElementById('tog-' + key).classList.toggle('active', modes[key]);
     }
 
     const smallCapsMap = {
-      a: 'ᴀ', b: 'ʙ', c: 'ᴄ', d: 'ᴅ', e: 'ᴇ', f: 'ꜰ', g: 'ɢ',
-      h: 'ʜ', i: 'ɪ', j: 'ᴊ', k: 'ᴋ', l: 'ʟ', m: 'ᴍ', n: 'ɴ',
-      o: 'ᴏ', p: 'ᴘ', q: 'ǫ', r: 'ʀ', s: 'ꜱ', t: 'ᴛ', u: 'ᴜ',
-      v: 'ᴠ', w: 'ᴡ', x: 'x', y: 'ʏ', z: 'ᴢ',
-      A: 'ᴀ', B: 'ʙ', C: 'ᴄ', D: 'ᴅ', E: 'ᴇ', F: 'ꜰ', G: 'ɢ',
-      H: 'ʜ', I: 'ɪ', J: 'ᴊ', K: 'ᴋ', L: 'ʟ', M: 'ᴍ', N: 'ɴ',
-      O: 'ᴏ', P: 'ᴘ', Q: 'ǫ', R: 'ʀ', S: 'ꜱ', T: 'ᴛ', U: 'ᴜ',
-      V: 'ᴠ', W: 'ᴡ', X: 'x', Y: 'ʏ', Z: 'ᴢ'
+      a:'ᴀ',b:'ʙ',c:'ᴄ',d:'ᴅ',e:'ᴇ',f:'ꜰ',g:'ɢ',h:'ʜ',i:'ɪ',j:'ᴊ',k:'ᴋ',l:'ʟ',m:'ᴍ',n:'ɴ',
+      o:'ᴏ',p:'ᴘ',q:'ǫ',r:'ʀ',s:'ꜱ',t:'ᴛ',u:'ᴜ',v:'ᴠ',w:'ᴡ',x:'x',y:'ʏ',z:'ᴢ',
+      A:'ᴀ',B:'ʙ',C:'ᴄ',D:'ᴅ',E:'ᴇ',F:'ꜰ',G:'ɢ',H:'ʜ',I:'ɪ',J:'ᴊ',K:'ᴋ',L:'ʟ',M:'ᴍ',N:'ɴ',
+      O:'ᴏ',P:'ᴘ',Q:'ǫ',R:'ʀ',S:'ꜱ',T:'ᴛ',U:'ᴜ',V:'ᴠ',W:'ᴡ',X:'x',Y:'ʏ',Z:'ᴢ'
     };
 
-    
-    const MC_CODES = new Set('0123456789abcdefklmnorABCDEFKLMNOR');
+    const MC_CODES  = new Set('0123456789abcdefklmnorABCDEFKLMNOR');
+    const HEX_CHARS = new Set('0123456789abcdefABCDEF');
+
+    function isHex(c) { return HEX_CHARS.has(c); }
 
     function convertText(text) {
       let result = '';
       let i = 0;
       while (i < text.length) {
-        const char = text[i];
+        const c = text[i];
 
-        if (legacyMode && (char === '&' || char === '§') && i + 1 < text.length && MC_CODES.has(text[i + 1])) {
-          // Conserver le préfixe + le code sans conversion
-          result += char + text[i + 1];
-          i += 2;
-          continue;
+        // §x§r§r§g§g§b§b
+        if (modes.hexsect && c === '§' && text[i+1] === 'x') {
+          let ok = true;
+          for (let k = 0; k < 6; k++) {
+            const off = 2 + k * 2;
+            if (text[i+off] !== '§' || !isHex(text[i+off+1])) { ok = false; break; }
+          }
+          if (ok) { result += text.slice(i, i+14); i += 14; continue; }
         }
 
-        result += smallCapsMap[char] || char;
+        // &x&r&r&g&g&b&b
+        if (modes.hexamp && c === '&' && text[i+1] === 'x') {
+          let ok = true;
+          for (let k = 0; k < 6; k++) {
+            const off = 2 + k * 2;
+            if (text[i+off] !== '&' || !isHex(text[i+off+1])) { ok = false; break; }
+          }
+          if (ok) { result += text.slice(i, i+14); i += 14; continue; }
+        }
+
+        // legacy §x
+        if (modes.legacy && c === '§' && i+1 < text.length && MC_CODES.has(text[i+1])) {
+          result += c + text[i+1]; i += 2; continue;
+        }
+
+        // &x legacy
+        if (modes.amplegacy && c === '&' && i+1 < text.length && MC_CODES.has(text[i+1])) {
+          result += c + text[i+1]; i += 2; continue;
+        }
+
+        // &#rrggbb
+        if (modes.hex6 && c === '&' && text[i+1] === '#') {
+          let j = i+2, hex = '';
+          while (hex.length < 6 && j < text.length && isHex(text[j])) { hex += text[j]; j++; }
+          if (hex.length === 6) { result += text.slice(i, j); i = j; continue; }
+        }
+
+        // <#rrggbb>
+        if (modes.hexbracket && c === '<' && text[i+1] === '#') {
+          let j = i+2, hex = '';
+          while (hex.length < 6 && j < text.length && isHex(text[j])) { hex += text[j]; j++; }
+          if (hex.length === 6 && text[j] === '>') { result += text.slice(i, j+1); i = j+1; continue; }
+        }
+
+        // MiniMessage <tag>
+        if (modes.minimsg && c === '<') {
+          const end = text.indexOf('>', i+1);
+          if (end !== -1 && end - i <= 64) { result += text.slice(i, end+1); i = end+1; continue; }
+        }
+
+        // JSON "color":"..."
+        if (modes.json && c === '"') {
+          const keyMatch = text.slice(i).match(/^"color"\s*:\s*"([^"]*)"/i);
+          if (keyMatch) { result += text.slice(i, i + keyMatch[0].length); i += keyMatch[0].length; continue; }
+          const hexStr = text.slice(i).match(/^"#[0-9a-fA-F]{6}"/);
+          if (hexStr) { result += hexStr[0]; i += hexStr[0].length; continue; }
+        }
+
+        result += smallCapsMap[c] || c;
         i++;
       }
       return result;
@@ -211,12 +269,12 @@
       document.getElementById('outputText').value = convertText(text);
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const apiText = params.get("text");
-
+    // API mode (?text=...)
+    const params  = new URLSearchParams(window.location.search);
+    const apiText = params.get('text');
     if (apiText) {
       const converted = convertText(apiText);
-      document.getElementById('inputText').value = apiText;
+      document.getElementById('inputText').value  = apiText;
       document.getElementById('outputText').value = converted;
       document.body.innerHTML = `<pre style="color:white;font-size:1.5rem">${converted}</pre>`;
     }
